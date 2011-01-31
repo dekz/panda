@@ -8,17 +8,22 @@ PROTOCOL_VERSION = '29'
 PANDORA_URL = 'www.pandora.com'
 API_URL = '/radio/xmlrpc/v' + PROTOCOL_VERSION + '?'
 USER_AGENT = 'Pithos/0.2'
+rid = 0
 
 xmlrpc_call = (method, args, url_args) ->
   if url_args is true
     url_args = args
+  #insert the time
   args.splice 0, 0, new Date().getTime()
   xml = pianorpc.xmlrpc_make_call method, args
   data = libpianocrypt.PianoEncryptString xml
   console.log xml
   console.log data
+
   urimethod = method.split('.')[1]
   url_arg_strings = []
+  if rid isnt 0
+    url_arg_strings.push("rid=#{rid}")
   url_arg_strings.push("method=#{urimethod}")
   console.log url_args
   count = 1
@@ -41,6 +46,7 @@ xmlrpc_call = (method, args, url_args) ->
       console.log 'BODY:' + chunk
 
 connect = (user, password) ->
+  rid = (new String(new Date().getTime()).substring(0,10) % 10000000) + 'P'
   user = xmlrpc_call('listener.authenticateListener', [user, password], [])
 
 connect('dekz', 'test')
