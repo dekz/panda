@@ -14,7 +14,8 @@ xmlrpc_call = (method, args, url_args) ->
   if url_args is true
     url_args = args
   #insert the time
-  args.splice 0, 0, new Date().getTime()
+  time = parseInt(new String(new Date().getTime()).substring(0,10)) 
+  args.splice 0, 0, time
   xml = pianorpc.xmlrpc_make_call method, args
   data = libpianocrypt.PianoEncryptString xml
   console.log xml
@@ -34,7 +35,7 @@ xmlrpc_call = (method, args, url_args) ->
   url = API_URL + url_arg_strings.join('&')
 
   pandora = http.createClient 80, PANDORA_URL
-  request = pandora.request 'POST', url, { 'user-agent': USER_AGENT, 'content-type': 'text/xml', 'content-length': "'#{data.length}'" }
+  request = pandora.request 'POST', url, { 'user-agent': USER_AGENT, 'content-type': 'text/xml' } #, 'content-length': "'#{data.length}'" }
   request.write(data)
   request.end()
 
@@ -49,7 +50,7 @@ connect = (user, password) ->
   rid = (new String(new Date().getTime()).substring(0,10) % 10000000) + 'P'
   user = xmlrpc_call('listener.authenticateListener', [user, password], [])
 
-connect('dekz', 'test')
+connect('dekzter@gmail.com', 'test')
 
 format_url_arg = (value) ->
   type = typeof value
